@@ -29,12 +29,13 @@ const EffectiveHpChart: React.FC = () => {
       throw new Error(`Failed to find stat at level ${level} for ${name}`);
     }
     const { hp, defense, sp_defense } = levelStat;
-    const phyHp = Math.floor((hp * (600 + defense)) / defense);
-    const spHp = Math.floor((hp * (600 + sp_defense)) / sp_defense);
+    const phyHp = Math.floor((hp * (600 + defense)) / 600);
+    const spHp = Math.floor((hp * (600 + sp_defense)) / 600);
     return { name, phyHp, spHp };
   }).sort((p1, p2) => {
     return getSortKey(p1) - getSortKey(p2);
   });
+  console.log(data);
   return (
     <Bar
       layout="horizontal"
