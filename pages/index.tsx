@@ -3,14 +3,62 @@ import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { fetchStats, Stat } from "../lib/stat";
 import { useEffect, useState } from "react";
+import { Bar } from "@nivo/bar";
 
-const Home: NextPage = () => {
+const EffectiveHpChart: React.FC = () => {
   const [stat, setStat] = useState<Stat | null>(null);
   useEffect(() => {
     fetchStats().then((newStat) => {
       setStat(newStat);
     });
   }, []);
+  if (stat === null) {
+    return null;
+  }
+  // TODO: Make level as an slider input.
+  const level = 15;
+  type EffectiveHpStat = {name: string, phyHp: number, spHp: number};
+
+  // TODO: Make this configurable.
+  const getSortKey = (p: EffectiveHpStat) => p.phyHp + p.spHp;
+
+  const data = stat.map((pokemon) => {
+    const name = pokemon.name;
+    const levelStat = pokemon.level.find((l) => l.level === level);
+    if (levelStat === undefined) {
+      throw new Error(`Failed to find stat at level ${level} for ${name}`);
+    }
+    const { hp, defense, sp_defense } = levelStat;
+    const phyHp = Math.floor((hp * (600 + defense)) / defense);
+    const spHp = Math.floor((hp * (600 + sp_defense)) / sp_defense);
+    return { name, phyHp, spHp };
+  }).sort((p1, p2) => {
+    return getSortKey(p1) - getSortKey(p2);
+  });
+  return (
+    <Bar
+      layout="horizontal"
+      groupMode="grouped"
+      width={600}
+      height={1000}
+      margin={{ top: 0, right: 40, bottom: 50, left: 80 }}
+      padding={0.3}
+      enableGridY={false}
+      data={data}
+      indexBy="name"
+      keys={["phyHp", "spHp"]}
+      axisLeft={{
+        legendOffset: -40,
+        legendPosition: "middle",
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+      }}
+    />
+  );
+};
+
+const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
@@ -20,7 +68,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        {stat !== null && <pre>{JSON.stringify(stat, null, 2)}</pre>}
+        <EffectiveHpChart />
       </main>
     </div>
   );
