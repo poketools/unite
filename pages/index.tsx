@@ -56,13 +56,15 @@ const EffectiveHpChart: React.FC = () => {
 
   return (
     <VStack w="100%">
-      <Text>Level {level}</Text>
-      <Slider min={1} max={15} defaultValue={15} onChange={handleLevelChange}>
-        <SliderTrack>
-          <SliderFilledTrack />
-        </SliderTrack>
-        <SliderThumb />
-      </Slider>
+      <Box w="100%" px={4}>
+        <Text>Level {level}</Text>
+        <Slider min={1} max={15} defaultValue={15} onChange={handleLevelChange}>
+          <SliderTrack>
+            <SliderFilledTrack />
+          </SliderTrack>
+          <SliderThumb />
+        </Slider>
+      </Box>
       <Box w="100%" h="1000px">
         <ResponsiveBar
           layout="horizontal"
