@@ -3,6 +3,7 @@ import Head from "next/head";
 import { fetchStats, Stat } from "../lib/stat";
 import { useCallback, useEffect, useState } from "react";
 import { ResponsiveBar } from "@nivo/bar";
+import { Line } from "@nivo/line";
 import {
   Slider,
   SliderTrack,
@@ -14,14 +15,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const EffectiveHpChart: React.FC = () => {
-  const [stat, setStat] = useState<Stat | null>(null);
-  useEffect(() => {
-    fetchStats().then((newStat) => {
-      setStat(newStat);
-    });
-  }, []);
-
+const EffectiveHpChart: React.FC<{ stat: Stat }> = ({ stat }) => {
   const [level, setLevel] = useState<number>(15);
   const handleLevelChange = useCallback((newLevel: number) => {
     // TODO: debounce the update for the actual bar chart for better
@@ -88,16 +82,59 @@ const EffectiveHpChart: React.FC = () => {
   );
 };
 
+const LevelStatChart: React.FC<{ stat: Stat }> = ({ stat }) => {
+  // TODO: Select pokemons to compare.
+  // TODO: Select stat to compare.
+  const data = stat
+    .map((s) => ({
+      id: s.name,
+      data: s.level.map((lv) => ({ x: lv.level, y: lv.attack })),
+    }))
+    .sort((a, b) => a.data[a.data.length - 1].y - b.data[b.data.length - 1].y)
+  return (
+    <Box w="100%" h="640px">
+      <Line
+        width={600}
+        height={640}
+        enableSlices="x"
+        margin={{ top: 20, right: 120, bottom: 50, left: 80 }}
+        data={data}
+        legends={[
+          {
+            anchor: "bottom-right",
+            direction: "column",
+            itemWidth: 80,
+            itemHeight: 20,
+            translateX: 100,
+            symbolSize: 12,
+          },
+        ]}
+      />
+    </Box>
+  );
+};
+
 const Home: NextPage = () => {
+  const [stat, setStat] = useState<Stat | null>(null);
+  useEffect(() => {
+    fetchStats().then((newStat) => {
+      setStat(newStat);
+    });
+  }, []);
+
   return (
     <Container maxW="2xl" centerContent pt={4}>
       <Head>
         <title>Unite Explorer</title>
-        <meta name="description" content="Data Visualization for Pokemon Unite" />
+        <meta
+          name="description"
+          content="Data Visualization for Pokemon Unite"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <EffectiveHpChart />
+      {stat && <EffectiveHpChart stat={stat} />}
+      {stat && <LevelStatChart stat={stat} />}
     </Container>
   );
 };
