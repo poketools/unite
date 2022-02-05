@@ -115,6 +115,11 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
         return $detail
           .querySelectorAll(`tr.mh-row-color-${color}`)
           .map(($tr) => {
+            const pokemon = assertExists(
+              $tr
+                .querySelector(".heroicon-image")
+                ?.attributes?.src?.match(/(?<=t_Square_).*(?=\.png)/)?.[0]
+            );
             const [level, name, score, kdi, stat] = $tr
               .querySelectorAll("td")
               .map(($td) => $td.innerText.trim().replace(/\s{2,}/g, "|"));
@@ -128,7 +133,7 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
               level: Number(level),
               name,
               score: Number(score),
-              pokemon: "TODO",
+              pokemon,
               kill,
               assist,
               interrupt,
