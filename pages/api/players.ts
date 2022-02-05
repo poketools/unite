@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { parse } from "node-html-parser";
+import dayjs from "dayjs";
 
 import { writeFileSync } from "fs";
 
@@ -32,7 +33,9 @@ interface TeamMateInfo {
 }
 
 interface MatchInfo {
-  time: Date;
+  // ISO8601 string with timezone from dayjs.
+  time: string;
+
   result: string;
   allyScore: number;
   opponentScore: number;
@@ -64,6 +67,7 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
     .replace("</div>\n<script", "<script")
     .replace("</body>\n</html>\n</body>", "</body>\n</html>");
 
+  // TODO: Remove this debugging file.
   writeFileSync("/tmp/a.html", fixedHtml);
 
   // TODO: This is soooooo slow. Maybe we should do it in simple regex for
@@ -85,11 +89,13 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
       const $summary = $summaries[i];
       const $detail = $details[i];
       const result = $summary.querySelector("div > b")?.innerText;
-      const time = new Date(
-        Number(
-          assertExists($summary.querySelector("unix-timestamp")?.innerText)
-        ) * 1000
-      );
+      const time = dayjs
+        .unix(
+          Number(
+            assertExists($summary.querySelector("unix-timestamp")?.innerText)
+          )
+        )
+        .format();
 
       // Yes, `.mh-purple` is for orange score. It seems that UniteAPI dev
       // messed the mh-push class.
@@ -105,7 +111,7 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
       const opponentScore = isAllyOrange ? purpleScore : orangeScore;
 
       recentRankedMatches.push({
-        time: time,
+        time,
         result: assertExists(result),
         allyScore,
         opponentScore,

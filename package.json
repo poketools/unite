@@ -14,6 +14,7 @@
     "@nivo/bar": "^0.79.0",
     "@nivo/core": "^0.79.0",
     "@nivo/line": "^0.79.0",
+    "dayjs": "^1.10.7",
     "framer-motion": "^4",
     "next": "12.0.4",
     "node-html-parser": "^5.2.0",
