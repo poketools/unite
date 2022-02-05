@@ -20,7 +20,7 @@ function assertExists<T>(value: T | null | undefined): T {
   return value;
 }
 
-interface TeamMateInfo {
+interface TeammateInfo {
   level: number;
   name: string;
   pokemon: string;
@@ -40,8 +40,8 @@ interface MatchInfo {
   result: string;
   allyScore: number;
   opponentScore: number;
-  teamAlly: TeamMateInfo[];
-  teamOpponent: TeamMateInfo[];
+  teamAlly: TeammateInfo[];
+  teamOpponent: TeammateInfo[];
 }
 
 interface PlayerInfo {
@@ -111,7 +111,7 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
       const allyScore = isAllyOrange ? orangeScore : purpleScore;
       const opponentScore = isAllyOrange ? purpleScore : orangeScore;
 
-      const parseTeam = (color: "purple" | "orange"): TeamMateInfo[] => {
+      const parseTeam = (color: "purple" | "orange"): TeammateInfo[] => {
         return $detail
           .querySelectorAll(`tr.mh-row-color-${color}`)
           .map(($tr) => {
