@@ -21,6 +21,7 @@ function assertExists<T>(value: T | null | undefined): T {
 }
 
 interface TeamMateInfo {
+  level: number;
   name: string;
   pokemon: string;
   score: number;
@@ -110,13 +111,46 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
       const allyScore = isAllyOrange ? orangeScore : purpleScore;
       const opponentScore = isAllyOrange ? purpleScore : orangeScore;
 
+      const parseTeam = (color: "purple" | "orange"): TeamMateInfo[] => {
+        return $detail
+          .querySelectorAll(`tr.mh-row-color-${color}`)
+          .map(($tr) => {
+            const [level, name, score, kdi, stat] = $tr
+              .querySelectorAll("td")
+              .map(($td) => $td.innerText.trim().replace(/\s{2,}/g, "|"));
+            const [kill, assist, interrupt] = kdi
+              .split("|")
+              .map((x) => Number(x));
+            const [damageDealt, damageTaken, recovery] = assertExists(
+              stat.match(/(?<=\|)\d+/g)
+            ).map((x) => Number(x));
+            return {
+              level: Number(level),
+              name,
+              score: Number(score),
+              pokemon: "TODO",
+              kill,
+              assist,
+              interrupt,
+              damageDealt,
+              damageTaken,
+              recovery,
+            };
+          });
+      };
+
+      const orangeTeam = parseTeam("purple");
+      const purpleTeam = parseTeam("orange");
+      const teamAlly = isAllyOrange ? orangeTeam : purpleTeam;
+      const teamOpponent = isAllyOrange ? purpleTeam : orangeTeam;
+
       recentRankedMatches.push({
         time,
         result: assertExists(result),
         allyScore,
         opponentScore,
-        teamAlly: [],
-        teamOpponent: [],
+        teamAlly,
+        teamOpponent,
       });
     }
   }
