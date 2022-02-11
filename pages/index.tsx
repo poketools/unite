@@ -90,7 +90,7 @@ const LevelStatChart: React.FC<{ stat: Stat }> = ({ stat }) => {
       id: s.name,
       data: s.level.map((lv) => ({ x: lv.level, y: lv.attack })),
     }))
-    .sort((a, b) => a.data[a.data.length - 1].y - b.data[b.data.length - 1].y)
+    .sort((a, b) => a.data[a.data.length - 1].y - b.data[b.data.length - 1].y);
   return (
     <Box w="100%" h="640px">
       <Line

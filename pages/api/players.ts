@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { MatchInfo, PlayerInfo, TeammateInfo } from "../../lib/player";
 
 import { parse } from "node-html-parser";
 import dayjs from "dayjs";
@@ -18,35 +19,6 @@ function assertExists<T>(value: T | null | undefined): T {
   assert(value !== null);
   assert(value !== undefined);
   return value;
-}
-
-interface TeammateInfo {
-  level: number;
-  name: string;
-  pokemon: string;
-  score: number;
-  kill: number;
-  assist: number;
-  interrupt: number;
-  damageDealt: number;
-  damageTaken: number;
-  recovery: number;
-}
-
-interface MatchInfo {
-  // ISO8601 string with timezone from dayjs.
-  time: string;
-
-  result: string;
-  allyScore: number;
-  opponentScore: number;
-  teamAlly: TeammateInfo[];
-  teamOpponent: TeammateInfo[];
-}
-
-interface PlayerInfo {
-  masterRank: number;
-  recentRankedMatches: MatchInfo[];
 }
 
 async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
