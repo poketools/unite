@@ -1,10 +1,14 @@
 import type { NextPage } from "next";
-import { Container, Input, Text, IconButton, HStack } from "@chakra-ui/react";
+import {
+  Container,
+  Input,
+  Text,
+  IconButton,
+  HStack,
+} from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PlayerInfo } from "../lib/player";
 import { useForm, SubmitHandler } from "react-hook-form";
-
-import { ListItem, UnorderedList } from "@chakra-ui/react";
 
 import useSWR from "swr";
 import { useState } from "react";
@@ -31,11 +35,9 @@ const usePlayerInfo = (name: string) => {
 type FormInput = { name: string };
 
 const PlayerInfoSummary: React.FC<{ info: PlayerInfo }> = ({ info }) => {
-  return (
-    <UnorderedList>
-      <ListItem>Master Rank: {info.masterRank}</ListItem>
-    </UnorderedList>
-  );
+  const summary: Partial<PlayerInfo> = { ...info };
+  delete summary.recentRankedMatches;
+  return <pre>{JSON.stringify(summary, null, 2)}</pre>;
 };
 
 const Players: NextPage = () => {
