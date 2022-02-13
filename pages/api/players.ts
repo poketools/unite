@@ -153,7 +153,7 @@ export default async function handler(
   if (typeof name !== "string") {
     res.status(200).json({
       id: "",
-      name,
+      name: "",
       level: 0,
       cup: "",
       masterRank: 0,
