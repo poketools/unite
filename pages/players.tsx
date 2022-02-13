@@ -12,6 +12,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 
 import useSWR from "swr";
 import { useState } from "react";
+import Head from "next/head";
 
 async function fetcher<T>(...args: Parameters<typeof fetch>): Promise<T> {
   const res = await fetch(...args);
@@ -49,6 +50,14 @@ const Players: NextPage = () => {
   };
   return (
     <Container maxW="2xl" centerContent pt={4}>
+      <Head>
+        <title>Unite Player</title>
+        <meta
+          name="description"
+          content="Get Pokemon Unite Player Info"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <form onSubmit={handleSubmit(onSubmit)}>
         <HStack>
           <Input placeholder="Name or ID" {...register("name")} />
