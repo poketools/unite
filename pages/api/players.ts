@@ -21,8 +21,8 @@ function assertExists<T>(value: T | null | undefined): T {
   return value;
 }
 
-async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
-  const res = await fetch(encodeURI(`https://uniteapi.dev/p/${name}`));
+async function fetchPlayerInfo(nameOrId: string): Promise<PlayerInfo> {
+  const res = await fetch(encodeURI(`https://uniteapi.dev/p/${nameOrId}`));
   const html = await res.text();
 
   // Fix the malformatted html in the result that will fail the parser.
@@ -46,6 +46,10 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
   // TODO: This is soooooo slow. Maybe we should do it in simple regex for
   // better performance.
   const $doc = parse(fixedHtml);
+
+  const name = assertExists(
+    $doc.querySelector(".player-card-name-info > p")?.text
+  );
 
   const [id, lvStr, cup] = $doc
     .querySelectorAll(".player-card-text > p")
@@ -137,7 +141,7 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
     }
   }
 
-  return { id, level, cup, masterRank, recentRankedMatches };
+  return { id, name, level, cup, masterRank, recentRankedMatches };
 }
 
 export default async function handler(
@@ -147,15 +151,14 @@ export default async function handler(
   // TODO: Better typing and validation.
   const { name } = req.query;
   if (typeof name !== "string") {
-    res
-      .status(200)
-      .json({
-        id: "",
-        level: 0,
-        cup: "",
-        masterRank: 0,
-        recentRankedMatches: [],
-      });
+    res.status(200).json({
+      id: "",
+      name,
+      level: 0,
+      cup: "",
+      masterRank: 0,
+      recentRankedMatches: [],
+    });
     return;
   }
   const info = await fetchPlayerInfo(name);
