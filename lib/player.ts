@@ -23,6 +23,7 @@ export interface MatchInfo {
 }
 
 export interface PlayerInfo {
+  id: string,
   masterRank: number;
   recentRankedMatches: MatchInfo[];
 }
