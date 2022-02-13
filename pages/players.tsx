@@ -40,12 +40,14 @@ const PlayerInfoSummary: React.FC<{ info: PlayerInfo }> = ({ info }) => {
 const Players: NextPage = () => {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const { info, isLoading, isError } = usePlayerInfo(name);
   const { register, handleSubmit } = useForm<FormInput>();
   useEffect(() => {
     const newName = router.query?.name ?? "";
     if (typeof newName === "string" && newName !== "") {
       setName(newName);
+      setInputValue(newName);
     }
   }, [router.query]);
   const onSubmit: SubmitHandler<FormInput> = (data) => {
@@ -53,6 +55,11 @@ const Players: NextPage = () => {
     router.push(encodeURI(`/players?name=${data.name}`), undefined, {
       shallow: true,
     });
+  };
+  const handleInputValueChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setInputValue(event.target.value);
   };
   return (
     <Container maxW="2xl" centerContent pt={4}>
@@ -63,7 +70,12 @@ const Players: NextPage = () => {
       </Head>
       <form onSubmit={handleSubmit(onSubmit)}>
         <HStack>
-          <Input placeholder="Name or ID" {...register("name")} />
+          <Input
+            placeholder="Name or ID"
+            {...register("name")}
+            value={inputValue}
+            onChange={handleInputValueChange}
+          />
           <IconButton
             type="submit"
             colorScheme="blue"
