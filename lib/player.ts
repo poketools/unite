@@ -11,6 +11,11 @@ export interface TeammateInfo {
   recovery: number;
 }
 
+export interface TeammateCount {
+  name: string;
+  count: number;
+}
+
 export interface MatchInfo {
   // ISO8601 string with timezone from dayjs.
   time: string;
@@ -28,5 +33,6 @@ export interface PlayerInfo {
   level: number;
   cup: string;
   masterRank: number;
+  recentTeammates: TeammateCount[];
   recentRankedMatches: MatchInfo[];
 }

@@ -1,5 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { MatchInfo, PlayerInfo, TeammateInfo } from "../../lib/player";
+import {
+  MatchInfo,
+  PlayerInfo,
+  TeammateCount,
+  TeammateInfo,
+} from "../../lib/player";
 
 import { parse } from "node-html-parser";
 import dayjs from "dayjs";
@@ -59,6 +64,16 @@ async function fetchPlayerInfo(nameOrId: string): Promise<PlayerInfo> {
   const masterRank = Number(
     $doc.querySelector(".master-rank")?.text?.trim() ?? "0"
   );
+
+  const recentTeammates: TeammateCount[] = $doc
+    .querySelectorAll(".potential-partners-span")
+    .map(($span) => {
+      const [name, countStr] = $span
+        .querySelectorAll("div")
+        .map(($div) => $div.text);
+      const count = Number(assertExists(countStr.match(/\d+/)?.[0]));
+      return { name, count };
+    }).sort((a, b) => b.count - a.count);
 
   const recentRankedMatches: MatchInfo[] = [];
 
@@ -141,7 +156,15 @@ async function fetchPlayerInfo(nameOrId: string): Promise<PlayerInfo> {
     }
   }
 
-  return { id, name, level, cup, masterRank, recentRankedMatches };
+  return {
+    id,
+    name,
+    level,
+    cup,
+    masterRank,
+    recentTeammates,
+    recentRankedMatches,
+  };
 }
 
 export default async function handler(
@@ -157,6 +180,7 @@ export default async function handler(
       level: 0,
       cup: "",
       masterRank: 0,
+      recentTeammates: [],
       recentRankedMatches: [],
     });
     return;
