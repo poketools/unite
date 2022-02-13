@@ -47,11 +47,10 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
   // better performance.
   const $doc = parse(fixedHtml);
 
-  const id = assertExists(
-    $doc
-      .querySelector("meta[property='og:title']")
-      ?.attributes?.content?.match(/\((\w+)\)$/)?.[1]
-  );
+  const [id, lvStr, cup] = $doc
+    .querySelectorAll(".player-card-text > p")
+    .map((c) => c.text.trim());
+  const level = Number(lvStr.match(/\d+/)?.[0] ?? 0);
 
   const masterRank = Number(
     $doc.querySelector(".master-rank")?.text?.trim() ?? "0"
@@ -138,7 +137,7 @@ async function fetchPlayerInfo(name: string): Promise<PlayerInfo> {
     }
   }
 
-  return { id, masterRank, recentRankedMatches };
+  return { id, level, cup, masterRank, recentRankedMatches };
 }
 
 export default async function handler(
@@ -148,7 +147,15 @@ export default async function handler(
   // TODO: Better typing and validation.
   const { name } = req.query;
   if (typeof name !== "string") {
-    res.status(200).json({ id: "", masterRank: 0, recentRankedMatches: [] });
+    res
+      .status(200)
+      .json({
+        id: "",
+        level: 0,
+        cup: "",
+        masterRank: 0,
+        recentRankedMatches: [],
+      });
     return;
   }
   const info = await fetchPlayerInfo(name);
