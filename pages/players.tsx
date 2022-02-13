@@ -1,17 +1,13 @@
 import type { NextPage } from "next";
-import {
-  Container,
-  Input,
-  Text,
-  IconButton,
-  HStack,
-} from "@chakra-ui/react";
+import { useRouter } from "next/router";
+
+import { Container, Input, Text, IconButton, HStack } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PlayerInfo } from "../lib/player";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import useSWR from "swr";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
 
 async function fetcher<T>(...args: Parameters<typeof fetch>): Promise<T> {
@@ -42,20 +38,27 @@ const PlayerInfoSummary: React.FC<{ info: PlayerInfo }> = ({ info }) => {
 };
 
 const Players: NextPage = () => {
+  const router = useRouter();
   const [name, setName] = useState("");
   const { info, isLoading, isError } = usePlayerInfo(name);
   const { register, handleSubmit } = useForm<FormInput>();
+  useEffect(() => {
+    const newName = router.query?.name ?? "";
+    if (typeof newName === "string" && newName !== "") {
+      setName(newName);
+    }
+  }, [router.query]);
   const onSubmit: SubmitHandler<FormInput> = (data) => {
     setName(data.name);
+    router.push(encodeURI(`/players?name=${data.name}`), undefined, {
+      shallow: true,
+    });
   };
   return (
     <Container maxW="2xl" centerContent pt={4}>
       <Head>
         <title>Unite Player</title>
-        <meta
-          name="description"
-          content="Get Pokemon Unite Player Info"
-        />
+        <meta name="description" content="Get Pokemon Unite Player Info" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <form onSubmit={handleSubmit(onSubmit)}>
